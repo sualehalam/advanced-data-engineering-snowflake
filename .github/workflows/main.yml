@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      # ADD THIS LINE TO FORCE THE CLI TO RECOGNIZE THE PROFILE
+      SNOWFLAKE_DEFAULT_CONNECTION_NAME: "modern_data_engineering_snowflake"
+      
       # Read connection secret
       SNOWFLAKE_CONNECTIONS_MODERN_DATA_ENGINEERING_SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
       SNOWFLAKE_CONNECTIONS_MODERN_DATA_ENGINEERING_SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
