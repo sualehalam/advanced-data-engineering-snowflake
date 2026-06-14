@@ -18,13 +18,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # ADD THIS LINE TO FORCE THE CLI TO RECOGNIZE THE PROFILE
-      SNOWFLAKE_DEFAULT_CONNECTION_NAME: "modern_data_engineering_snowflake"
-      
       # Read connection secret
-      SNOWFLAKE_CONNECTIONS_MODERN_DATA_ENGINEERING_SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_CONNECTIONS_MODERN_DATA_ENGINEERING_SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_CONNECTIONS_MODERN_DATA_ENGINEERING_SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_CONNECTIONS_ADVANCED_DATA_ENGINEERING_SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_CONNECTIONS_ADVANCED_DATA_ENGINEERING_SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_CONNECTIONS_ADVANCED_DATA_ENGINEERING_SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
 
     steps:
       # Checkout step is necessary to access repository files
@@ -39,9 +36,11 @@ jobs:
           
           if [[ $TARGET_BRANCH == "staging" ]]; then
             echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+            echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
             echo "Environment set to staging"
           elif [[ $TARGET_BRANCH == "main" ]]; then
             echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
+            echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
             echo "Environment set to production"
           else
             echo "Unexpected branch: $TARGET_BRANCH"
@@ -57,15 +56,15 @@ jobs:
 
       # Fetch latest changes from the repository to Snowflake
       - name: Fetch latest changes to Snowflake
-        run: snow git fetch course_repo.public.advanced_data_engineering_snowflake -c modern_data_engineering_snowflake
+        run: snow git fetch course_repo.public.advanced_data_engineering_snowflake -c advanced_data_engineering_snowflake
 
       # Deploy templates to the data environment -
       - name: Deploy templates to data environment
         run: |
           # Export TARGET_BRANCH for use in this step
-          echo "Using branch: ${GITHUB_REF_NAME}"
-          snow git execute @advanced_data_engineering_snowflake/branches/${GITHUB_REF}/module-1/hamburg_weather/pipeline/data/ \
+          echo "Using branch: ${TARGET_BRANCH}"
+          snow git execute @advanced_data_engineering_snowflake/branches/${TARGET_BRANCH}/module-1/hamburg_weather/pipeline/data/ \
           -D "env='${{ env.DEPLOY_ENV }}'" \
           --database=COURSE_REPO \
           --schema=PUBLIC \
-          -c modern_data_engineering_snowflake
+          -c advanced_data_engineering_snowflake
