@@ -37,9 +37,11 @@ jobs:
           
           if [[ $TARGET_BRANCH == "staging" ]]; then
             echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+            echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
             echo "Environment set to staging"
           elif [[ $TARGET_BRANCH == "main" ]]; then
             echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
+            echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
             echo "Environment set to production"
           else
             echo "Unexpected branch: $TARGET_BRANCH"
@@ -61,8 +63,8 @@ jobs:
       - name: Deploy templates to data environment
         run: |
           # Export TARGET_BRANCH for use in this step
-          echo "Using branch: ${GITHUB_REF_NAME}"
-          snow git execute @advanced_data_engineering_snowflake/branches/${GITHUB_REF}/module-1/hamburg_weather/pipeline/data/ \
+          echo "Using branch: ${TARGET_BRANCH}"
+          snow git execute @advanced_data_engineering_snowflake/branches/${TARGET_BRANCH}/module-1/hamburg_weather/pipeline/data/ \
           -D "env='${{ env.DEPLOY_ENV }}'" \
           --database=COURSE_REPO \
           --schema=PUBLIC \
